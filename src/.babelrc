@@ -1,0 +1,10 @@
+{
+  "plugins": [
+    ["prismjs", {
+      "languages": ["javascript", "css", "markup", "python", "java", "typescript", "jsx"],
+      "plugins": ["line-numbers", "copy-to-clipboard"],
+      "theme": "okaidia",
+      "css": true
+    }]
+  ]
+}
