@@ -9,7 +9,7 @@ import FullscreenCodeViewer from './components/FullscreenCodeViewer';
 import { io } from 'socket.io-client';
 
 const App = () => {
-  const socket = useMemo(() => io("http://localhost:5000"), []);
+  const socket = useMemo(() => io("https://codesender-backend-production.up.railway.app/"), []);
   
   const [currentRoom, setCurrentRoom] = useState('');
   const [roomCode, setRoomCode] = useState('');
