@@ -62,11 +62,52 @@ const App = () => {
     };
   }, [socket]);
 
+<<<<<<< HEAD
   // Save to local storage on join
   useEffect(() => {
     if (isJoined) {
       localStorage.setItem("roomId", currentRoom);
       localStorage.setItem("messages", JSON.stringify(messages));
+=======
+  // Save when joining
+  useEffect(() => {
+    if (isJoined) {
+      localStorage.setItem('roomId', currentRoom);
+      localStorage.setItem('messages', JSON.stringify(messages));
+    }
+  }, [isJoined, currentRoom, messages]);
+
+// Load saved room and messages on mount
+  useEffect(() => {
+  const savedRoom = localStorage.getItem('roomId');
+  const savedMessages = JSON.parse(localStorage.getItem('messages') || '[]');
+
+  if (savedRoom) {
+    setCurrentRoom(savedRoom);
+    setIsJoined(true);
+    setMessages(savedMessages);
+    socket.emit("joinRoom", { roomId: savedRoom, username: "You" });
+  }
+  }, []);
+
+
+
+  const extractFileOrFunctionName = (code) => {
+    const functionMatch = code.match(/(?:function\s+|def\s+|const\s+|let\s+|var\s+)([a-zA-Z_$][a-zA-Z0-9_$]*)/);
+    if (functionMatch) return functionMatch[1];
+
+    const classMatch = code.match(/(?:class\s+)([a-zA-Z_$][a-zA-Z0-9_$]*)/);
+    if (classMatch) return classMatch[1];
+
+    const componentMatch = code.match(/(?:const\s+|function\s+)([A-Z][a-zA-Z0-9_$]*)/);
+    if (componentMatch) return componentMatch[1];
+
+    const lines = code.split('\n');
+    const firstLine = lines[0].trim();
+    if (firstLine.includes('//') && firstLine.includes('.')) {
+      const fileMatch = firstLine.match(/([a-zA-Z0-9_-]+\.[a-zA-Z0-9]+)/);
+      if (fileMatch) return fileMatch[1];
+>>>>>>> 1038f8dd98a605e6eb840a5bcb7d6d031ea3e959
     }
   }, [isJoined, currentRoom, messages]);
 
@@ -129,9 +170,16 @@ const App = () => {
     setCurrentRoom("");
     setRoomCode("");
     setMessages([]);
+<<<<<<< HEAD
     setUserCount(1);
     localStorage.removeItem("roomId");
     localStorage.removeItem("messages");
+=======
+
+    // CLEAR LOCAL STORAGE
+    localStorage.removeItem('roomId');
+    localStorage.removeItem('messages');
+>>>>>>> 1038f8dd98a605e6eb840a5bcb7d6d031ea3e959
   };
 
   const closeFullscreen = () => setFullscreenMessage(null);
@@ -153,10 +201,20 @@ const App = () => {
               {/* Chat and history area */}
               <div className="lg:col-span-3">
                 <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl h-full flex flex-col shadow-2xl">
+<<<<<<< HEAD
                   <ChatHeader 
                     currentRoom={currentRoom} 
                     onLeaveRoom={leaveRoom}
                     userCount={userCount}
+=======
+                  <ChatHeader currentRoom={currentRoom} onLeaveRoom={leaveRoom} />
+                  <div className="flex flex-col justify-end flex-1 overflow-y-auto pb-45">
+                  <ChatMessages
+                    messages={messages}
+                    onCopy={copyCode}
+                    copied={copied}
+                    onViewFullscreen={viewFullscreen}
+>>>>>>> 1038f8dd98a605e6eb840a5bcb7d6d031ea3e959
                   />
 
                   {/* Chat scroll area, with extra padding on small screens */}
@@ -169,10 +227,15 @@ const App = () => {
                     />
                   </div>
                 </div>
+                </div>
               </div>
 
+<<<<<<< HEAD
               {/* Code input: fixed on mobile, static on desktop */}
               <div className="lg:col-span-1 lg:relative fixed bottom-0 left-0 right-0 lg:static">
+=======
+              <div className="lg:col-span-1 fixed bottom-[-14px] left-0 right-0 lg:static">
+>>>>>>> 1038f8dd98a605e6eb840a5bcb7d6d031ea3e959
                 <CodeInput
                   codeInput={codeInput}
                   setCodeInput={setCodeInput}
