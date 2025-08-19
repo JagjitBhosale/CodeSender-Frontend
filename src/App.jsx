@@ -18,6 +18,7 @@ const App = () => {
   const [isJoined, setIsJoined] = useState(false);
   const [copied, setCopied] = useState(false);
   const [fullscreenMessage, setFullscreenMessage] = useState(null);
+  const [userCount, setUserCount] = useState(1);
 
   // Receive messages
   useEffect(() => {
@@ -25,7 +26,7 @@ const App = () => {
       setMessages((prev) => [
         ...prev,
         {
-          id: Date.now(),
+          id: data.timestamp || Date.now(),
           fileName: extractFileOrFunctionName(data.code),
           code: data.code,
           language: data.language,
@@ -34,7 +35,31 @@ const App = () => {
         },
       ]);
     });
-    return () => socket.off("receiveMessage");
+
+    // User count tracking
+    socket.on("userJoined", (data) => {
+      setUserCount(data.userCount);
+    });
+
+    socket.on("userLeft", (data) => {
+      setUserCount(data.userCount);
+    });
+
+    socket.on("userCountUpdate", (data) => {
+      setUserCount(data.userCount);
+    });
+
+    socket.on("roomInfo", (data) => {
+      setUserCount(data.userCount);
+    });
+
+    return () => {
+      socket.off("receiveMessage");
+      socket.off("userJoined");
+      socket.off("userLeft");
+      socket.off("userCountUpdate");
+      socket.off("roomInfo");
+    };
   }, [socket]);
 
   // Save to local storage on join
@@ -78,12 +103,13 @@ const App = () => {
   const sendCode = () => {
     if (!codeInput.trim()) return;
     const language = detectLanguage(codeInput);
+    const timestamp = Date.now();
     const newMsg = {
-      id: Date.now(),
+      id: timestamp,
       fileName: extractFileOrFunctionName(codeInput),
       code: codeInput,
       language,
-      timestamp: new Date().toLocaleTimeString(),
+      timestamp: new Date(timestamp).toLocaleTimeString(),
       sender: "You",
     };
     setMessages((p) => [...p, newMsg]);
@@ -98,10 +124,12 @@ const App = () => {
   };
 
   const leaveRoom = () => {
+    socket.emit("leaveRoom", { roomId: currentRoom });
     setIsJoined(false);
     setCurrentRoom("");
     setRoomCode("");
     setMessages([]);
+    setUserCount(1);
     localStorage.removeItem("roomId");
     localStorage.removeItem("messages");
   };
@@ -125,7 +153,11 @@ const App = () => {
               {/* Chat and history area */}
               <div className="lg:col-span-3">
                 <div className="backdrop-blur-xl bg-white/5 border border-white/10 rounded-3xl h-full flex flex-col shadow-2xl">
-                  <ChatHeader currentRoom={currentRoom} onLeaveRoom={leaveRoom} />
+                  <ChatHeader 
+                    currentRoom={currentRoom} 
+                    onLeaveRoom={leaveRoom}
+                    userCount={userCount}
+                  />
 
                   {/* Chat scroll area, with extra padding on small screens */}
                   <div className="flex flex-col flex-1 overflow-y-auto pb-[180px] lg:pb-0">
